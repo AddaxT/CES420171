@@ -1,0 +1,43 @@
+* Consultas de agregación
+
+-- Operadores de agregación
+$addToSet, $avg, $first, $last, $max, $min, $push, $sum
+
+** Ejemplos:
+
+-- El total de habitantes para el estado de Nueva York (NY)
+db.zips.aggregate({$group: {_id: "$state", totalPop: {$sum: "$pop"}}}, {$match: {_id: {$eq: "NY"}}})
+db.zips.aggregate({$group: {_id: "$state", totalPop: {$sum: "$pop"}}}, {$match: {_id: "NY"}})
+db.zips.group( {
+   key: { state: 1 },
+   cond: { state: { $eq: "NY" } },
+   reduce: function(cur, result) { result.totalPop += cur.pop },
+   initial: { totalPop: 0 }
+})
+
+-- Los estado con 10 millones de habitantes o mas
+db.zips.aggregate({$group: {_id: "$state", totalPop: {$sum: "$pop"}}}, {$match: {totalPop: {$gte: 10000000}}})
+
+-- Los diferentes estados
+db.zips.distinct("state")
+db.zips.aggregate({$group: {_id: "$state", state: {$addToSet: "$state"}}}, {$project:{_id:0, state:1}})
+
+-- Numero total de estados
+db.zips.aggregate({ $group: { _id: "$state"}  }, { $group: { _id: 1, count: { $sum: 1 } } })
+var pipeline = [ 
+    { $group: { _id: "$state"}  },
+    { $group: { _id: 1, count: { $sum: 1 } } }
+];
+var results = db.runCommand( 
+    {
+    "aggregate": "zips" , 
+    "pipeline": pipeline
+    }
+);
+printjson(results);
+
+* Map-Reduce
+
+-- Total habitantes por estado
+db.zips.mapReduce(function(){emit(this.state, this.pop);},function(state, pop){return Array.sum(pop);}, { out: "totalPopulation" })
+db.zips.mapReduce(function(){emit(this.state, this.pop);},function(state, pop){return Array.sum(pop);}, { out: {inline: 1} })
