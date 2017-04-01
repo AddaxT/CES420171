@@ -1,6 +1,9 @@
 var express = require('express');
 var bodyparser = require('body-parser');
-var {ContactRouter} = require('./routes');
+var mongoose = require('mongoose');
+var { ContactRouter } = require('./contact/routes');
+
+mongoose.connect('mongodb://localhost:27017/contacts');
 let app = express();
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
