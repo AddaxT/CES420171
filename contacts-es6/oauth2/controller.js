@@ -1,22 +1,22 @@
 var oauth2orize = require('oauth2orize');
-var User = require('./user/model');
-var Client = require('./client/model');
-var Token = require('./token/model');
-var Code = require('./code/model');
+var { UserModel } = require('./user/model');
+var { ClientModel } = require('./client/model');
+var { TokenModel } = require('./token/model');
+var { CodeModel } = require('./code/model');
 
 var server = oauth2orize.createServer();
 
 server.serializeClient((client, callback) => callback(null, client._id));
 
 server.deserializeClient((id, callback) => {
-    Client.findOne({ _id: id })
+    ClientModel.findOne({ _id: id })
         .exec()
         .then((client) => callback(null, client))
         .catch(e => callback(e));
 });
 
 server.grant(oauth2orize.grant.code((client, redirectUri, user, ares, callback) => {
-    var code = new Code({
+    var code = new CodeModel({
         value: uid(16),
         clientId: client._id,
         redirectUri: redirectUri,
@@ -28,7 +28,7 @@ server.grant(oauth2orize.grant.code((client, redirectUri, user, ares, callback) 
 }));
 
 server.exchange(oauth2orize.exchange.code((client, code, redirectUri, callback) => {
-    Code.findOne({ value: code })
+    CodeModel.findOne({ value: code })
         .exec()
         .then((authCode) => {
             if (authCode === undefined) { return callback(null, false); }
@@ -38,7 +38,7 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectUri, callback) 
             authCode.remove()
                 .then(() => {
                     
-                    var token = new Token({
+                    var token = new TokenModel({
                         value: uid(256),
                         clientId: authCode.clientId,
                         userId: authCode.userId
@@ -55,7 +55,7 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectUri, callback) 
 exports.authorization = [
     server.authorization((clientId, redirectUri, callback) => {
 
-        Client.findOne({ id: clientId })
+        ClientModel.findOne({ id: clientId })
             .exec()
             .then((client) => callback(null, client, redirectUri))
             .catch(e => callback(e));

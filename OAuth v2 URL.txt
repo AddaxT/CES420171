@@ -1,0 +1,18 @@
+Authorization code URL
+
+http://localhost:3000/oauth2/authorize?client_id=TestApp&response_type=code&redirect_uri=http://localhost:3000
+
+Authorization token
+
+[POST] http://localhost:3000/oauth2/token
+
+- Authorization type: Basic
+- Username: client_id
+- Password: client_secret
+
+
+[GET] http://localhost:3000/contacts
+
+- Headers:
+	- Authorization => Bearer <access_token.value>
+
