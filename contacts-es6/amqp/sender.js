@@ -8,12 +8,13 @@ class Sender {
     }
 
     sendMessage(message) {
+        let _self = this;
         amqp.connect(this.host).then(function (connection) {
             return connection.createChannel().then(function (channel) {
-                var ok = channel.assertQueue(this.queue, { durable: false });
+                var ok = channel.assertQueue(_self.queue, { durable: false });
 
                 return ok.then(function (_qok) {
-                    channel.sendToQueue(this.queue, Buffer.from(message));
+                    channel.sendToQueue(_self.queue, Buffer.from(message));
                     console.log(`Mensaje enviado con exito ${message}`);
                     return channel.close();
                 });
@@ -21,3 +22,5 @@ class Sender {
         }).catch(console.warn);
     }
 }
+
+exports.Sender = Sender;
