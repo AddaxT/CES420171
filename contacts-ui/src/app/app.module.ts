@@ -5,17 +5,20 @@ import { RouterModule } from "@angular/router";
 import { HttpModule } from '@angular/http';
 import { MaterialModule, MdButtonModule } from '@angular/material';
 import { AuthGuard } from './auth-guard/auth-guard.guard';
-import { AccessCodeGuard } from './access-code/access-code.guard';
 import { Oauthv2TokenHandlerService } from './oauthv2-token-handler/oauthv2-token-handler.service';
 import { routeConfig } from './routes';
 
 import 'hammerjs';
 
 import { AppComponent } from './app.component';
+import { ContactListComponent } from './contact-list/contact-list.component';
+import { MainWindowComponent } from './main-window/main-window.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ContactListComponent,
+    MainWindowComponent
   ],
   imports: [
     BrowserModule,
@@ -25,7 +28,7 @@ import { AppComponent } from './app.component';
     MaterialModule,
     MdButtonModule
   ],
-  providers: [AuthGuard, Oauthv2TokenHandlerService, AuthGuard],
+  providers: [AuthGuard, Oauthv2TokenHandlerService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
